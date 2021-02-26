@@ -1,10 +1,16 @@
 const express = require("express");
-const app = express();
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const crypto = require('crypto');
+const https = require('https');
+const fs = require('fs');
+
+var bodyParser = require('body-parser');
+
 
 const port = process.env.PORT || 5080;
+const app = express();
+app.use(bodyParser.json());
 
 // Extended: https://swagger.io/specification/#infoObject
 const swaggerOptions = {
@@ -36,19 +42,30 @@ app.use(express.json())
  *        description: string
  *        required: true
  *        schema:
- *          type: string
- *          format: string
+ *          type: object
+ *          properties:
+ *           hash:
+ *              type: "string"
  *    responses:
  *      '200':
- *        description: A successful response
+ *        description: OK
+ *        content:
+ *         application/json:
+ *          schema:
+ *           type: object
+ *           properties:
+ *            hash:
+ *              type: string
  */
 app.post("/hash", (req, res) => {
-  console.log(req.body);
+  console.log(req.body.hash);
+
   res.status(200).send(
     crypto.createHash('sha256')
-    .update(Buffer.from(req.body, 'base64')
+    .update(Buffer.from(req.body.hash, 'base64')
     .toString('ascii'))
     .digest('hex'));
+
 });
 
 /**
@@ -57,13 +74,24 @@ app.post("/hash", (req, res) => {
  *  get:
  *    responses:
  *      '200':
- *       description: A successful response
+ *        description: OK
+ *        content:
+ *         application/json:
+ *          schema:
+ *           type: object
+ *           properties:
+ *            data:
+ *              type: Hellow Worl
  */
 
 app.get("/", (req, res) => {
   res.status(200).send("Hellow World");
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+// we will pass our 'app' to 'https' server
+https.createServer({
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem'),
+  passphrase: '7788'
+}, app)
+.listen(3000);
