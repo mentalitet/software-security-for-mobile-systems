@@ -58,13 +58,22 @@ app.use(express.json())
  *              type: string
  */
 app.post("/hash", (req, res) => {
-  console.log(req.body.hash);
+  console.log(req.body.data);
 
-  res.status(200).send(
-    crypto.createHash('sha256')
-    .update(Buffer.from(req.body.hash, 'base64')
-    .toString('ascii'))
-    .digest('hex'));
+  // res.status(200).send(
+  //   crypto.createHash('sha256')
+  //   .update(Buffer.from(req.body.data, 'base64')
+  //   .toString('ascii'))
+  //   .digest('hex'));
+
+  var reqString = crypto.createHash('sha256')
+   // updating data 
+  .update(Buffer.from(req.body.data, 'base64')
+  .toString('ascii'))
+  // Encoding to be used 
+  .digest('hex');
+
+  res.status(200).json({ hash: reqString})
 
 });
 
@@ -94,4 +103,4 @@ https.createServer({
   cert: fs.readFileSync('cert.pem'),
   passphrase: '7788'
 }, app)
-.listen(3000);
+.listen(3000, () => console.log('Listening....'));
