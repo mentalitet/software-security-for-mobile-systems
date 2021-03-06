@@ -58,13 +58,7 @@ app.use(express.json())
  *              type: string
  */
 app.post("/hash", (req, res) => {
-  console.log(req.body.data);
-
-  // res.status(200).send(
-  //   crypto.createHash('sha256')
-  //   .update(Buffer.from(req.body.data, 'base64')
-  //   .toString('ascii'))
-  //   .digest('hex'));
+  console.log('Req data: ' + req.body.data);
 
   var reqString = crypto.createHash('sha256')
    // updating data 
@@ -72,6 +66,9 @@ app.post("/hash", (req, res) => {
   .toString('ascii'))
   // Encoding to be used 
   .digest('hex');
+
+
+  console.log('Resp data: ' + reqString);
 
   res.status(200).json({ hash: reqString})
 
@@ -150,8 +147,8 @@ app.get("/", (req, res) => {
 
 // we will pass our 'app' to 'https' server
 https.createServer({
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem'),
+  key: fs.readFileSync('key.key'),
+  cert: fs.readFileSync('cert.crt'),
   passphrase: '7788'
 }, app)
 .listen(3000, () => console.log('Listening....'));
