@@ -15,4 +15,9 @@
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@android:color/white</item>
     </style>
+
+    <style name="Widget.AppCompat.ProgressBar.Horizontal" parent="android:Widget">
+        @null
+    </style>
+
 </resources>
