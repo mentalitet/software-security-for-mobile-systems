@@ -54,8 +54,8 @@ app.get('/button_close.png', (req, res) => {
 
 // we will pass our 'app' to 'https' server
 https.createServer({
-  key: fs.readFileSync('key.key'),
-  cert: fs.readFileSync('cert.crt'),
+  key: fs.readFileSync('K.pem'),
+  cert: fs.readFileSync('C.pem'),
   passphrase: '7788'
 }, app)
 .listen(port, () => console.log('Listening fishing site on ' + port));

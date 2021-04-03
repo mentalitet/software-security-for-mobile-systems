@@ -8,7 +8,7 @@ const fs = require('fs');
 var bodyParser = require('body-parser');
 
 
-const port = process.env.PORT || 5080;
+const port = process.env.PORT || 3000;
 const app = express();
 app.use(bodyParser.json());
 
@@ -147,8 +147,9 @@ app.get("/", (req, res) => {
 
 // we will pass our 'app' to 'https' server
 https.createServer({
-  key: fs.readFileSync('key.key'),
-  cert: fs.readFileSync('cert.crt'),
+  key: fs.readFileSync('key1.pem'),
+  cert: fs.readFileSync('cert1.pem'),
   passphrase: '7788'
 }, app)
+
 .listen(3000, () => console.log('Listening....'));

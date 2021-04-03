@@ -29,12 +29,12 @@ class _HomeScreenWiggetState extends State<HomeScreenWigget> {
 
     Dio dio = new Dio();
 
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (HttpClient client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-      return client;
-    };
+    // (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+    //     (HttpClient client) {
+    //   client.badCertificateCallback =
+    //       (X509Certificate cert, String host, int port) => true;
+    //   return client;
+    // };
 
     Response response = await dio.post("https://10.0.2.2:3000/hash",
         data: jsonEncode(<String, String>{
