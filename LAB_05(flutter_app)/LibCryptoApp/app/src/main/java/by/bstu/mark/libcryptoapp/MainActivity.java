@@ -13,12 +13,13 @@ public class MainActivity extends AppCompatActivity {
     {
         System.loadLibrary("cryptowrap");
     }
-// ================================================
+    // ================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         // == Определяем переменные для криптоопераций
         String selectedAlgoritm = "belt-hash";  // тип алгоритма хэширования
@@ -31,6 +32,5 @@ public class MainActivity extends AppCompatActivity {
         // Функция вычисления хэш значения. результат в cryptoCaseDigest.digest
         // cryptoCaseDigest = (new LCryptCore()).CreateDigest(selectedAlgoritm, arrBytesForDigest, arrBytesForDigest.length);
         CryptoCase cryptoCaseDigest = (new LCryptCore()).CreateDigest(selectedAlgoritm, testMsg.getBytes(), arrBytesForDigest.length);
-
     }
 }

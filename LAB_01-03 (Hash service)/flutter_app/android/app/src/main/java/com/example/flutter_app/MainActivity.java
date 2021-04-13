@@ -18,15 +18,14 @@ public class MainActivity extends FlutterActivity {
     static
     {
         System.loadLibrary("cryptowrap");
-
     }
 
-    private final String CHANNEL = "com.shichko.flutter/hash_channel";
+    private final String CHANNEL = "mark.flutter.dev/vhash";
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler((call, result) -> {
-            if (call.method.equals("getHash")) {
+            if (call.method.equals("libcrypto")) {
                 String hash = getHash(call.argument("data"));
                 result.success(hash);
             } else {
@@ -49,7 +48,7 @@ public class MainActivity extends FlutterActivity {
             hexChars[j * 2] = hexArray[v >>> 4];
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
-        return new String(hexChars);
+        return new String(hexChars).toLowerCase();
     }
 
     @Override

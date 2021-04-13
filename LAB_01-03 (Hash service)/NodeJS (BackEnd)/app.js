@@ -113,7 +113,7 @@ app.post("/vhash", (req, res) => {
 
   var reqHash = req.body.hash;
 
-  console.log('hashFromReq ' + reqDataToHash)
+  console.log('ServerGeneratedHash ' + reqDataToHash)
   console.log('hashFromReq ' + reqHash)
 
   if(reqDataToHash === reqHash) {
@@ -147,8 +147,8 @@ app.get("/", (req, res) => {
 
 // we will pass our 'app' to 'https' server
 https.createServer({
-  key: fs.readFileSync('key1.pem'),
-  cert: fs.readFileSync('cert1.pem'),
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem'),
   passphrase: '7788'
 }, app)
 
