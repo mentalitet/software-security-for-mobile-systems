@@ -172,7 +172,7 @@ class _AccelerometrPRSGeneratorState extends State<AccelerometrPRSGenerator> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(x.toStringAsFixed(2),
+                          child: Text(x.toString(),
                               style: TextStyle(fontSize: 20.0)),
                         )
                       ],
@@ -188,7 +188,7 @@ class _AccelerometrPRSGeneratorState extends State<AccelerometrPRSGenerator> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(y.toStringAsFixed(2),
+                          child: Text(y.toString(),
                               style: TextStyle(fontSize: 20.0)),
                         )
                       ],
@@ -204,7 +204,7 @@ class _AccelerometrPRSGeneratorState extends State<AccelerometrPRSGenerator> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(z.toStringAsFixed(2),
+                          child: Text(z.toString(),
                               style: TextStyle(fontSize: 20.0)),
                         )
                       ],
