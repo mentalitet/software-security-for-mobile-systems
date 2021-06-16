@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Emscripten-Generated Code</title>
+    <style>
+      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      textarea.emscripten { font-family: monospace; width: 80%; }
+      div.emscripten { text-align: center; }
+      div.emscripten_border { border: 1px solid black; }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      canvas.emscripten { border: 0px none; background-color: black; }
+
+      .spinner {
+        height: 50px;
+        width: 50px;
+        margin: 0px auto;
+        -webkit-animation: rotation .8s linear infinite;
+        -moz-animation: rotation .8s linear infinite;
+        -o-animation: rotation .8s linear infinite;
+        animation: rotation 0.8s linear infinite;
+        border-left: 10px solid rgb(0,150,240);
+        border-right: 10px solid rgb(0,150,240);
+        border-bottom: 10px solid rgb(0,150,240);
+        border-top: 10px solid rgb(100,0,200);
+        border-radius: 100%;
+        background-color: rgb(200,100,250);
+      }
+      @-webkit-keyframes rotation {
+        from {-webkit-transform: rotate(0deg);}
+        to {-webkit-transform: rotate(360deg);}
+      }
+      @-moz-keyframes rotation {
+        from {-moz-transform: rotate(0deg);}
+        to {-moz-transform: rotate(360deg);}
+      }
+      @-o-keyframes rotation {
+        from {-o-transform: rotate(0deg);}
+        to {-o-transform: rotate(360deg);}
+      }
+      @keyframes rotation {
+        from {transform: rotate(0deg);}
+        to {transform: rotate(360deg);}
+      }
+
+        #main-container {
+            display: flex;
+            flex-direction: column;
+            width: 700px;
+            margin: 0 auto;
+        }
+
+        #main-container input:not(.radio) {
+            width: 100%;
+        }
+
+        fieldset {
+           margin: 0 5px;
+        }
+
+        .radio-row {
+            display: flex;
+            flex-direction: row;
+        }
+        button {
+            width: 100%;
+        }
+    </style>
+  </head>
+  <body>
+    <figure style="overflow:visible;" id="spinner"><div class="spinner"></div><center style="margin-top:0.5em"><strong>WEBASM</strong></center></figure>
+    <div class="emscripten" id="status">LOADING WEBASM...</div>
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>  
+    </div>
+
+    <div id="main-container">
+        <form id="form">
+        <fieldset style="">
+            <legend>Numeric system</legend>
+            <div class="radio-row">
+                <input class="radio" type="radio" id="dec" name="numsys" value="dec" checked/>
+                <label class="radio" for="dec">DEC</label>
+            </div>
+            <div class="radio-row">
+                <input class="radio" type="radio" id="hex" name="numsys" value="hex"/>
+                <label class="radio" for="hex">HEX</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Curve params</legend>
+            <label>
+                p
+                <input id="curve-p" name="curve-p" type="text"/>
+            </label>
+            <label>
+                a
+                <input id="curve-a" name="curve-a" type="text"/>
+            </label>
+            <label>
+                b
+                <input id="curve-b" name="curve-b" type="text"/>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Point to multiply by</legend>
+            <label>
+                Gx
+                <input id="curve-gx" name="curve-gx" type="text"/>
+            </label>
+            <label>
+                Gy
+                <input id="curve-gy" name="curve-gy" type="text"/>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Scalar</legend>
+            <label>
+                d
+                <input id="curve-d" name="curve-d" type="text"/>
+            </label>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Result (d x G)</legend>
+            <label>
+                Time (seconds)
+                <input id="curve-time" name="curve-time" type="text" disabled/>
+            </label>
+            <label>
+                Qx
+                <input id="curve-qx" name="curve-qx" type="text" disabled/>
+            </label>
+            <label>
+                Qy
+                <input id="curve-qy" name="curve-qy" type="text" disabled/>
+            </label>
+        </fieldset>
+        <div style="margin-top: 5px; display: flex; flex-direction: row;">
+            <button type="button" id="btn-start-calc" style="flex: 1 1 100%">Start calculation</button>
+            <button type="button" id="btn-paste-from-stb" style="flex: 2 1 150%">Paste values from "СТБ 34.101.45-2013"</button>
+            <button type="reset" id="btn-reset" style="flex: 1 1 100%">Reset</button>
+        </div>
+        </form>
+    </div>
+
+    <script type='text/javascript'>
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+
+      var Module = {
+        preRun: [],
+        postRun: [],
+        printErr: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.error(text);
+        },
+        setStatus: function(text) {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m) {
+            text = m[1];
+            progressElement.value = parseInt(m[2])*100;
+            progressElement.max = parseInt(m[4])*100;
+            progressElement.hidden = false;
+            spinnerElement.hidden = false;
+          } else {
+            progressElement.value = null;
+            progressElement.max = null;
+            progressElement.hidden = true;
+            if (!text) spinnerElement.hidden = true;
+          }
+          statusElement.innerHTML = text;
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('LOADING WEBASM...');
+      window.onerror = function() {
+        Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) Module.printErr('[post-exception status] ' + text);
+        };
+      };
+    </script>
+	<script src="custom_script.js"></script>
+    {{{ SCRIPT }}}
+  </body>
+</html>
